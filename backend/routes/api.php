@@ -1,12 +1,15 @@
 <?php
 
 use App\Http\Controllers\Api\AnnotationController;
+use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DatasetController;
 use App\Http\Controllers\Api\ExportController;
+use App\Http\Controllers\Api\QaController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\TaxonomyController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Middleware\AuditRequest;
 use App\Http\Middleware\CheckRole;
 use App\Models\Role;
@@ -62,8 +65,33 @@ Route::middleware(['auth:sanctum', AuditRequest::class])->group(function () {
         Route::post('/reviews', [ReviewController::class, 'store']);
     });
 
+    // QA System
+    Route::middleware(CheckRole::class . ':' . Role::QA_REVIEWER . ',' . Role::ADMIN)->group(function () {
+        Route::post('/qa/calculate', [QaController::class, 'calculate']);
+        Route::post('/qa/calculate-dataset', [QaController::class, 'calculateDataset']);
+        Route::get('/qa/flagged', [QaController::class, 'flagged']);
+        Route::patch('/qa/{id}/resolve', [QaController::class, 'resolve']);
+        Route::get('/qa/stats/{datasetId}', [QaController::class, 'datasetStats']);
+    });
+
     // Export
     Route::middleware(CheckRole::class . ':' . Role::ADMIN)->group(function () {
         Route::get('/export/{datasetId}', [ExportController::class, 'export']);
+    });
+
+    // User Management (Admin only)
+    Route::middleware(CheckRole::class . ':' . Role::ADMIN)->group(function () {
+        Route::get('/users', [UserController::class, 'index']);
+        Route::post('/users', [UserController::class, 'store']);
+        Route::get('/users/annotators', [UserController::class, 'annotators']);
+        Route::get('/users/roles', [UserController::class, 'roles']);
+        Route::get('/users/{id}', [UserController::class, 'show']);
+        Route::put('/users/{id}', [UserController::class, 'update']);
+        Route::delete('/users/{id}', [UserController::class, 'destroy']);
+    });
+
+    // Audit Logs (Admin only)
+    Route::middleware(CheckRole::class . ':' . Role::ADMIN)->group(function () {
+        Route::get('/audit-logs', [AuditLogController::class, 'index']);
     });
 });

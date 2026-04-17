@@ -9,6 +9,7 @@ import Badge from '@/components/shared/Badge';
 import Button from '@/components/shared/Button';
 import { taskApi, annotationApi, reviewApi } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
+import { useAnnotationShortcuts } from '@/hooks/useKeyboard';
 import type { Task, Annotation, Label, Review } from '@/types';
 import toast from 'react-hot-toast';
 
@@ -28,6 +29,13 @@ export default function TaskAnnotationPage() {
   const [reviewDecision, setReviewDecision] = useState('');
   const [reviewComments, setReviewComments] = useState('');
   const [reviews, setReviews] = useState<Review[]>([]);
+
+  // Keyboard shortcuts for label selection
+  useAnnotationShortcuts({
+    labels: task?.taxonomy?.labels || [],
+    onSelectLabel: setSelectedLabel,
+    enabled: task?.status === 'pending' || task?.status === 'in_progress',
+  });
 
   const loadTask = async () => {
     try {

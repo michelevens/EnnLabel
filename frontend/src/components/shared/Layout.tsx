@@ -2,7 +2,7 @@
 
 import { useAuthStore } from '@/store/auth';
 import { useRouter, usePathname } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import {
   HomeIcon,
@@ -10,13 +10,26 @@ import {
   ClipboardDocumentListIcon,
   ArrowRightStartOnRectangleIcon,
   TagIcon,
+  UsersIcon,
+  ShieldCheckIcon,
+  ClipboardDocumentCheckIcon,
 } from '@heroicons/react/24/outline';
 
-const navigation = [
+interface NavItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  roles?: string[]; // if set, only visible to these roles
+}
+
+const allNavigation: NavItem[] = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Datasets', href: '/datasets', icon: CircleStackIcon },
   { name: 'Tasks', href: '/tasks', icon: ClipboardDocumentListIcon },
   { name: 'Taxonomies', href: '/taxonomies', icon: TagIcon },
+  { name: 'QA', href: '/qa', icon: ShieldCheckIcon, roles: ['admin', 'qa_reviewer'] },
+  { name: 'Users', href: '/users', icon: UsersIcon, roles: ['admin'] },
+  { name: 'Audit Logs', href: '/audit', icon: ClipboardDocumentCheckIcon, roles: ['admin'] },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -33,6 +46,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       router.push('/login');
     }
   }, [user, isLoading, router]);
+
+  const navigation = useMemo(() => {
+    if (!user) return [];
+    return allNavigation.filter(
+      (item) => !item.roles || item.roles.includes(user.role.name)
+    );
+  }, [user]);
 
   if (isLoading) {
     return (

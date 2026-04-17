@@ -148,3 +148,52 @@ export interface LoginResponse {
   token: string;
   requires_totp: boolean;
 }
+
+export interface QaScore {
+  id: string;
+  task_id: string;
+  annotator_a: string;
+  annotator_b: string;
+  agreement_score: number;
+  conflict_details: QaConflict[] | null;
+  flagged: boolean;
+  resolved_by: string | null;
+  resolved_at: string | null;
+  task?: Task;
+  annotatorA?: Pick<User, 'id' | 'name'>;
+  annotatorB?: Pick<User, 'id' | 'name'>;
+  created_at: string;
+}
+
+export interface QaConflict {
+  type: 'label_mismatch' | 'missing_span';
+  span: string;
+  text: string;
+  annotator?: string;
+  annotator_a_label?: string;
+  annotator_b_label?: string;
+}
+
+export interface QaDatasetStats {
+  total_comparisons: number;
+  average_agreement: number | null;
+  flagged_count: number;
+  resolved_count: number;
+  unresolved_count: number;
+  min_agreement?: number;
+  max_agreement?: number;
+}
+
+export interface AuditLogEntry {
+  id: string;
+  user_id: string | null;
+  action: string;
+  resource_type: string;
+  resource_id: string | null;
+  old_values: Record<string, unknown> | null;
+  new_values: Record<string, unknown> | null;
+  ip_address: string | null;
+  user_agent: string | null;
+  user?: Pick<User, 'id' | 'name' | 'email'>;
+  created_at: string;
+}

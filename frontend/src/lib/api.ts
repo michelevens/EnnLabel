@@ -112,4 +112,38 @@ export const exportApi = {
     api.get(`/export/${datasetId}`, { params: { format } }),
 };
 
+// QA
+export const qaApi = {
+  calculate: (taskId: string, annotatorA: string, annotatorB: string) =>
+    api.post('/qa/calculate', { task_id: taskId, annotator_a: annotatorA, annotator_b: annotatorB }),
+  calculateDataset: (datasetId: string) =>
+    api.post('/qa/calculate-dataset', { dataset_id: datasetId }),
+  flagged: (params?: Record<string, string>) =>
+    api.get('/qa/flagged', { params }),
+  resolve: (id: string) =>
+    api.patch(`/qa/${id}/resolve`),
+  datasetStats: (datasetId: string) =>
+    api.get(`/qa/stats/${datasetId}`),
+};
+
+// Users
+export const userApi = {
+  list: (params?: Record<string, string>) =>
+    api.get<PaginatedResponse<User>>('/users', { params }),
+  get: (id: string) => api.get<User>(`/users/${id}`),
+  create: (data: { name: string; email: string; password: string; role_id: string }) =>
+    api.post<User>('/users', data),
+  update: (id: string, data: Partial<User & { password?: string }>) =>
+    api.put<User>(`/users/${id}`, data),
+  delete: (id: string) => api.delete(`/users/${id}`),
+  annotators: () => api.get('/users/annotators'),
+  roles: () => api.get('/users/roles'),
+};
+
+// Audit Logs
+export const auditApi = {
+  list: (params?: Record<string, string>) =>
+    api.get('/audit-logs', { params }),
+};
+
 export default api;
