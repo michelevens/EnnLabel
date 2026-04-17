@@ -1,7 +1,9 @@
 import TaskAnnotationClient from './TaskAnnotationClient';
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
-  return [];
+  return [{ id: 'demo' }];
 }
 
 export default function TaskPage() {
