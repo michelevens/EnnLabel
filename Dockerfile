@@ -4,12 +4,14 @@ FROM php:8.3-cli-alpine
 RUN apk add --no-cache \
     postgresql-dev \
     libzip-dev \
+    libxml2-dev \
+    oniguruma-dev \
     zip \
     unzip \
     git \
     curl \
     bash \
-    && docker-php-ext-install pdo pdo_pgsql pgsql zip bcmath opcache
+    && docker-php-ext-install pdo pdo_pgsql pgsql zip bcmath opcache xml mbstring dom tokenizer ctype fileinfo
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
